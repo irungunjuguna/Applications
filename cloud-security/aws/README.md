@@ -1,72 +1,145 @@
+
 # AWS Cloud Security Baseline
 
-A governance-oriented baseline for designing, operating, monitoring, and continuously improving AWS environments. It defines minimum control expectations for identity, network boundaries, data protection, detection, audit logging, resilience, incident response, and secure software delivery.
+## 1. Overview
 
-> **Audience:** CISO and security leadership, cloud platform owners, security engineering, application teams, risk/compliance, and auditors.
->
-> **Status:** Reference baseline for adaptation. This repository is not an AWS service configuration, legal opinion, or certification. Validate controls against current AWS capabilities, applicable regulations, threat models, and organizational risk appetite before adoption.
+The AWS Cloud Security Baseline defines the minimum security, governance, operational and resilience requirements for deploying and managing workloads within Amazon Web Services (AWS).
 
-## Outcomes and principles
+It provides a structured framework for securing AWS accounts, identities, workloads, networks, data, applications and supporting infrastructure.
 
-- Establish accountable ownership, measurable controls, and auditable evidence across AWS accounts.
-- Prefer centralized, preventive guardrails with service-team accountability for workload-level controls.
-- Use identity federation and short-lived credentials; grant only the access needed for a defined purpose and duration.
-- Protect sensitive information through classification, encryption, access controls, and appropriate data-handling safeguards.
-- Enable organization-wide audit and security telemetry, protect it from alteration, and test alert response.
-- Use centralized configuration visibility and threat detection appropriate to workload risk.
-- Design backup and recovery around approved business impact analysis (BIA), Recovery Time Objectives (RTO), and Recovery Point Objectives (RPO)—not assumptions.
-- Treat infrastructure, source repositories, build systems, and deployment pipelines as production security boundaries.
-- Document, approve, time-limit, and review exceptions; no exception silently becomes the standard.
+The baseline is intended to guide cloud architecture decisions, security configurations, operational processes and ongoing control assurance. It establishes minimum expectations that can be adopted by technology teams and assessed by information security, risk and audit functions.
 
-## Baseline documents
+## 2. Objectives
 
-| Document | Scope |
-| --- | --- |
-| [Governance and control assurance](governance.md) | Ownership, control lifecycle, evidence, risk exceptions, and executive oversight. |
-| [Security control standards](security-controls.md) | IAM, network security, encryption, data protection, secrets, CloudTrail, monitoring, and secure deployments. |
-| [Resilience and recovery](resilience.md) | Backup, retention, recovery objectives, DR patterns, and restore testing. |
-| [Incident response playbooks](incident-response.md) | Triage and response procedures for common AWS security events. |
-| [Implementation and evidence checklist](implementation-checklist.md) | Rollout sequence, evidence examples, and operating cadence. |
+The objectives of this baseline are to:
 
-## Minimum baseline at a glance
+- Establish consistent security requirements across AWS environments.
+- Strengthen identity and access management through MFA, least privilege and controlled privileged access.
+- Protect workloads and data through secure network design, encryption and secrets management.
+- Establish centralized logging, monitoring, threat detection and security incident alerting.
+- Define backup, recovery and disaster recovery requirements.
+- Integrate security into infrastructure provisioning, application deployment and CI/CD pipelines.
+- Establish clear accountability for cloud security risks and control ownership.
+- Provide measurable evidence of security control implementation and effectiveness.
 
-1. AWS Organizations account boundaries and centrally managed guardrails are used where available; production workloads are separated from non-production.
-2. Human access is federated through an approved identity provider and AWS IAM Identity Center or an equivalent controlled federation. MFA is required for all human access.
-3. Root credentials are tightly controlled, protected with MFA, unused for routine work, and monitored. Workloads use roles and temporary credentials, not embedded access keys.
-4. Permissions are role-based and least privilege. Wildcards, privileged policies, and long-lived credentials require justification, controls, and review.
-5. Security groups and network controls allow only documented, necessary flows; broad public ingress is prohibited unless explicitly approved and protected.
-6. Sensitive data is classified and protected through encryption, access restrictions, secure handling, and appropriate key-management controls.
-7. Secrets and credentials are stored in approved secrets-management systems rather than source code, images, deployment artifacts, or logs.
-8. Organization-wide, multi-Region CloudTrail management-event logging is enabled and delivered to a restricted central archive. Required data events are selected by risk and service.
-9. AWS Config and approved threat-detection services provide configuration visibility and security findings across in-scope accounts and Regions, where supported and justified.
-10. CloudWatch and other approved telemetry feed actionable alerts with named owners, severity, response targets, and tested escalation paths.
-11. Backup and recovery policies are tiered by workload criticality, with protected copies and recurring restore/DR exercises.
-12. Production changes flow through authenticated, reviewed, policy-checked CI/CD using short-lived credentials and traceable artifacts.
-13. Security incidents are handled through documented playbooks, evidence-preserving procedures, and post-incident improvement.
+## 3. Scope
 
-## Use and tailoring
+This baseline applies to AWS environments used for development, testing, staging and production workloads.
 
-Start with [governance.md](governance.md) to assign owners and define risk tiers. Apply [security-controls.md](security-controls.md) across the organization, then tailor the recovery objectives and safeguards in [resilience.md](resilience.md). Exercise [incident-response.md](incident-response.md) with the relevant teams and track closure of checklist items in [implementation-checklist.md](implementation-checklist.md).
+It covers:
 
-Use a documented control mapping to connect this baseline to internal policies and external obligations. AWS service names, features, defaults, pricing, and regional availability can change; confirm current product documentation and test changes in a representative account before broad rollout.
+- AWS account and organizational governance.
+- Identity and Access Management (IAM).
+- Authentication, MFA and privileged access.
+- Network security and security group configuration.
+- Logging, monitoring and threat detection.
+- Data protection, encryption and secrets management.
+- Configuration management and vulnerability management.
+- Secure infrastructure and application deployment.
+- Backup, business continuity and disaster recovery.
+- Security incident response and operational assurance.
 
-Not every AWS service or control is applicable to every workload. Where a service is not used, document its non-applicability. Where a control cannot be implemented, record the risk, compensating safeguards, accountable owner, approval, and review date through the exception process.
+The baseline should be applied proportionately based on workload criticality, data classification, regulatory obligations and business risk.
 
-## Reference material
+## 4. Security Principles
 
-- [AWS Well-Architected Framework — Security Pillar](https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/welcome.html)
-- [AWS Security Reference Architecture](https://docs.aws.amazon.com/prescriptive-guidance/latest/security-reference-architecture/welcome.html)
-- [AWS Organizations](https://docs.aws.amazon.com/organizations/latest/userguide/orgs_introduction.html)
-- [AWS CloudTrail](https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html)
-- [AWS IAM best practices](https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html)
-- [AWS KMS best practices](https://docs.aws.amazon.com/kms/latest/developerguide/best-practices.html)
-- [AWS Config](https://docs.aws.amazon.com/config/latest/developerguide/WhatIsConfig.html)
-- [Amazon GuardDuty](https://docs.aws.amazon.com/guardduty/latest/ug/what-is-guardduty.html)
-- [AWS Security Hub](https://docs.aws.amazon.com/securityhub/latest/userguide/what-is-securityhub.html)
-- [AWS Backup](https://docs.aws.amazon.com/aws-backup/latest/devguide/whatisbackup.html)
+AWS environments should be designed and operated according to the following principles:
 
-## Versioning
+1. **Least privilege:** Grant users, applications and services only the permissions necessary to perform their responsibilities.
+2. **Zero trust:** Do not implicitly trust identities, workloads or network locations. Authenticate and authorize access appropriately.
+3. **Defense in depth:** Apply multiple complementary security controls across identity, network, workload and data layers.
+4. **Secure by design:** Incorporate security requirements into architecture, development and deployment processes.
+5. **Centralized visibility:** Maintain appropriate logging, monitoring and security event visibility across AWS accounts and workloads.
+6. **Resilience by design:** Ensure critical workloads have appropriate backup, recovery and disaster recovery capabilities.
+7. **Accountability:** Assign ownership for cloud security controls, risks, exceptions and remediation activities.
+8. **Continuous assurance:** Regularly evaluate control implementation, effectiveness and changes in the threat landscape.
 
-Baseline owner: Cloud Security.
+## 5. Baseline Requirements at a Glance
 
-Review at least annually and after material architecture, threat, regulatory, or AWS service changes. Material changes should follow the approval and change-control process in [governance.md](governance.md).
+| Security domain | Minimum expectation |
+|---|---|
+| Identity and access | Individual identities, MFA, least privilege, controlled privileged access |
+| Network security | Restricted ingress and egress, controlled security groups, network segmentation |
+| Logging | Centralized, protected and monitored CloudTrail logs |
+| Monitoring | CloudWatch monitoring and integration with security detection services |
+| Threat detection | Appropriate use of GuardDuty, Security Hub and Inspector |
+| Data protection | Encryption at rest and in transit, controlled data access and retention |
+| Secrets management | Secure storage and controlled access to credentials and application secrets |
+| Configuration management | AWS Config or equivalent configuration visibility and drift monitoring |
+| Vulnerability management | Identification, prioritization, tracking and remediation of vulnerabilities |
+| Backup | Protected backups, defined retention and tested restoration |
+| Disaster recovery | Documented recovery objectives, procedures and regular testing |
+| Incident response | Documented playbooks, escalation procedures and evidence preservation |
+| Secure deployment | Source control, peer review, automated security checks and controlled releases |
+
+The use of specific AWS services should be determined by architecture, workload requirements, service availability and risk.
+
+## 6. Repository Structure
+
+```text
+aws-cloud-security-baseline/
+│
+├── README.md
+│
+└── cloud-security/
+    └── aws/
+        ├── governance.md
+        ├── security-controls.md
+        ├── resilience.md
+        ├── incident-response.md
+        └── implementation-checklist.md
+```
+
+## 7. Baseline Documentation
+
+| Document | Purpose |
+|---|---|
+| `governance.md` | Defines accountability, ownership, risk management, exceptions and security oversight. |
+| `security-controls.md` | Defines IAM, MFA, network security, logging, monitoring, encryption, vulnerability management and secure deployment requirements. |
+| `resilience.md` | Establishes backup, recovery, resilience and disaster recovery requirements. |
+| `incident-response.md` | Defines cloud security incident response procedures and technical playbooks. |
+| `implementation-checklist.md` | Provides a practical implementation and assurance checklist for validating baseline adoption. |
+
+## 8. Governance and Compliance
+
+This baseline supports the implementation of security controls aligned with recognized industry practices and frameworks, including:
+
+- ISO/IEC 27001 and ISO/IEC 27002.
+- NIST Cybersecurity Framework.
+- CIS AWS Foundations Benchmark.
+- AWS Well-Architected Framework – Security Pillar.
+- Relevant regulatory, contractual and data protection obligations.
+
+The baseline is not a certification, compliance attestation or guarantee of security. Organizations should map its requirements to their applicable regulatory and contractual obligations.
+
+## 9. Implementation Approach
+
+Organizations should adopt the baseline through a controlled implementation process:
+
+1. Identify AWS accounts, workloads, data and business owners.
+2. Assess existing configurations and identify security gaps.
+3. Prioritize remediation according to risk and workload criticality.
+4. Implement required preventive, detective and corrective controls.
+5. Validate control configurations and operational effectiveness.
+6. Document exceptions, risks and compensating controls.
+7. Conduct periodic reviews and update the baseline as environments evolve.
+
+## 10. Ownership and Review
+
+The baseline should be maintained by the cloud security or information security function in collaboration with cloud platform, infrastructure, application development, operations, risk and compliance teams.
+
+The baseline should be reviewed at least annually and whenever significant changes occur to:
+
+- AWS architecture or organizational structure.
+- Regulatory or contractual requirements.
+- Security threats and vulnerabilities.
+- Business continuity and recovery requirements.
+- AWS services and security capabilities.
+
+Changes should be documented, reviewed and approved through the organization's established governance process.
+
+## 11. Disclaimer
+
+This repository provides a security governance and implementation reference. It does not automatically configure AWS environments or replace a formal security risk assessment.
+
+Implementation should be adapted to the organization's architecture, operating model, risk appetite and regulatory environment.
