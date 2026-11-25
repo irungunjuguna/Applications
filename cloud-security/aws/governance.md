@@ -1,146 +1,334 @@
-# Governance and Control Assurance
 
-## 1. Purpose and scope
+# AWS Cloud Security Governance
 
-This standard establishes accountable governance for AWS accounts, workloads, and delivery systems owned or operated by the organization. It applies to production and non-production environments, including services managed by internal teams and approved providers. Contractual, regulatory, and data-residency obligations may impose stricter requirements.
+## 1. Purpose
 
-The baseline sets minimum expectations. Workload owners remain responsible for secure architecture, data classification, application controls, operational readiness, and compliance with approved exceptions.
+This document establishes the governance framework for managing information security risks across AWS cloud environments.
 
-A control is not considered implemented solely because a service is enabled. Its coverage, configuration, alerting, ownership, evidence, and response must also be demonstrated.
+It defines accountability, ownership, oversight, risk management, control assurance and exception management requirements to ensure that AWS environments are operated securely and in alignment with organizational objectives.
 
-Where an AWS service or control is not applicable, the reason must be documented. Where a control cannot be met, the deviation must follow the formal risk exception process.
+The governance framework is designed to support executive oversight while ensuring that cloud security responsibilities are integrated into technology delivery and day-to-day operations.
 
-## 2. Governance model
+## 2. Governance Principles
 
-| Role | Accountability |
-| --- | --- |
-| Board / risk committee | Oversees material cyber risk, risk appetite, and significant residual risk through established reporting. |
-| CISO / security executive | Owns security policy, approves the baseline, sets risk thresholds, sponsors remediation, and escalates material exposure. |
-| Cloud Security | Maintains control design, threat guidance, detection requirements, exception review, and security assurance testing. |
-| Cloud Platform / landing-zone owner | Implements organization-level guardrails, identity integration, logging foundations, account lifecycle, configuration visibility, and platform evidence. |
-| Account / workload owner | Implements workload controls, names service owners, maintains inventory and recovery plans, remediates findings, and participates in exercises. |
-| SOC / incident commander | Monitors alerts, coordinates response, maintains incident records, and conducts after-action reviews. |
-| Risk / Compliance | Maps controls to obligations, validates evidence, tracks residual risk, and supports independent assurance. |
-| CI/CD and developer teams | Protect source, build, deployment identities, artifacts, approvals, and production change records. |
-| Data owner / privacy function | Defines data classification, handling requirements, access expectations, retention, and privacy obligations for relevant workloads. |
+AWS cloud security governance shall be guided by the following principles:
 
-Each AWS account must have a business owner, technical owner, environment classification, data classification, support/on-call contact, and cost owner recorded in the approved inventory.
+- **Accountability:** Every AWS environment, workload and security control must have an identified owner.
+- **Risk-based decision-making:** Security requirements should reflect business criticality, data sensitivity, regulatory obligations and threat exposure.
+- **Shared responsibility:** Cloud security responsibilities must be understood across AWS and the organization.
+- **Segregation of duties:** Administrative, operational, development and security responsibilities should be appropriately separated.
+- **Security by design:** Security requirements must be considered during architecture, procurement, development and deployment.
+- **Continuous oversight:** Security risks, control effectiveness and remediation progress must be regularly reviewed.
+- **Evidence-based assurance:** Control compliance must be supported by verifiable configuration records, operational evidence and testing.
 
-Accounts without accountable owners are escalated and may be restricted or decommissioned under approved lifecycle procedures.
+## 3. Governance and Accountability Structure
 
-AWS Organizations and its management account must receive additional protection. Access to organization-wide administration, consolidated billing, service control policies, delegated administration, and organization-level security services must be restricted, monitored, and subject to change control.
+The following governance structure defines the principal responsibilities for AWS security.
 
-## 3. Control lifecycle
+### 3.1 Executive Management / Board Risk Oversight
 
-For each control, maintain:
+Executive management and relevant Board committees provide oversight of material technology and cybersecurity risks.
 
-- A unique control ID, objective, applicability, implementation guidance, and accountable owner.
-- A testable pass/fail or maturity measure, evidence source, assessment frequency, and remediation target.
-- A mapping to internal policies and relevant external requirements, maintained separately from this technical baseline.
-- A record of findings, severity, compensating safeguards, due date, and closure evidence.
-- A documented process for identifying and recording controls that are not applicable to a particular account or workload.
+Responsibilities include:
 
-Use preventive controls where feasible, detective controls for residual risk, and documented response procedures.
+- Approving the organization's technology and cybersecurity risk appetite.
+- Reviewing material cloud security risks and significant incidents.
+- Ensuring adequate resources are allocated to cloud security and resilience.
+- Reviewing significant risk exceptions and unresolved high-risk findings.
+- Monitoring management's response to material security issues.
 
-Prefer organization-level policies and centrally managed services for consistency, while preserving workload-level ownership and documented responsibility boundaries.
+The Board should receive information proportionate to its oversight responsibilities rather than routine technical configuration reports.
 
-Organization-level guardrails must be tested for their actual scope and limitations. For example, service control policies define maximum available permissions for affected member accounts; they do not grant permissions, and they do not apply to the AWS Organizations management account in the same way they apply to member accounts. Validate policy behavior and recovery procedures before enforcement.
+### 3.2 Chief Information Security Officer (CISO) / Information Security Function
 
-## 4. Risk and exception management
+The CISO or designated information security function provides security governance and oversight of AWS environments.
 
-A baseline deviation requires a written exception before implementation, except where an approved emergency process applies.
+Responsibilities include:
 
-Each request must include:
+- Establishing and maintaining cloud security policies and baseline requirements.
+- Defining minimum security controls for AWS environments.
+- Providing independent security review and challenge where organizational responsibilities require it.
+- Reviewing cloud security risks and material control deficiencies.
+- Monitoring security findings, remediation progress and risk exceptions.
+- Providing security guidance for cloud architecture and technology initiatives.
+- Overseeing cloud incident response readiness and security assurance.
+- Reporting material cloud security risks and control performance to executive management and relevant governance committees.
 
-1. Control ID and affected accounts, resources, data, and environments.
-2. Business rationale and threat/risk assessment, including potential blast radius.
-3. Compensating controls, monitoring, and incident response implications.
-4. Named accountable owner and risk owner, remediation plan, and target date.
-5. Approval under the organization's delegated risk authority; material residual risk is escalated to the CISO or designated committee.
+The CISO should have appropriate visibility into AWS security posture, material risks, exceptions and remediation status.
 
-Exceptions must be time-bound, normally no longer than 90 days without renewal. Renewal requires updated evidence and risk review.
+### 3.3 Cloud Platform / Infrastructure Team
 
-Expired exceptions revert to baseline requirements and are escalated. Emergency changes must be documented and reviewed promptly after stabilization.
+The cloud platform or infrastructure team is responsible for implementing and operating approved AWS environments.
 
-No approval waives legal, regulatory, or contractual obligations. Where a requirement cannot legally or contractually be waived, the exception process must not be used to authorize non-compliance.
+Responsibilities include:
 
-Risk acceptance must be made by an individual with the appropriate delegated authority. Technical teams may recommend acceptance but must not accept material business risk on behalf of the organization unless formally authorized.
+- Managing AWS accounts and organizational structures.
+- Implementing approved IAM, network and infrastructure configurations.
+- Maintaining secure infrastructure provisioning and configuration practices.
+- Implementing logging, monitoring and backup configurations.
+- Managing cloud infrastructure changes.
+- Supporting vulnerability remediation and incident response.
+- Maintaining infrastructure documentation and operational evidence.
 
-## 5. Risk tiers and review cadence
+### 3.4 Application and Development Teams
 
-At minimum, classify workloads as **Critical**, **High**, **Standard**, or **Sandbox** using business impact, data sensitivity, internet exposure, and dependency analysis.
+Application and development teams are responsible for ensuring that workloads deployed to AWS meet approved security requirements.
 
-Critical and High workloads require stronger recovery objectives, more frequent privileged-access review, and prioritized incident response.
+Responsibilities include:
 
-Sandbox accounts remain subject to identity, audit logging, and non-production data safeguards; they are not exempt from foundational security controls. Production data must not be copied into lower environments without approved masking, minimization, and access safeguards.
+- Applying secure coding and deployment practices.
+- Protecting application credentials and secrets.
+- Integrating security testing into CI/CD pipelines.
+- Implementing application-level logging and monitoring.
+- Addressing vulnerabilities in application code and dependencies.
+- Maintaining application recovery procedures and supporting incident investigations.
 
-Recommended minimum governance cadence:
+### 3.5 Risk, Compliance and Internal Audit
 
-- **Continuous or daily:** control-plane detections, pipeline security gates, high-severity alerts, and exposed-resource checks.
-- **Monthly:** security findings and overdue remediation review; inventory/account owner validation.
-- **Quarterly:** privileged access and exception review; recovery-point and backup coverage reporting; incident response contact validation.
-- **At least annually:** policy and threat review, access recertification for all access, DR exercise for critical services, and baseline approval.
-- **After significant change:** reassess threat model, data classification, recovery design, and applicable controls.
+Risk and compliance functions support the identification, assessment and monitoring of cloud-related risks and applicable obligations.
 
-Adjust frequencies based on risk, threat intelligence, regulation, and demonstrated control effectiveness.
+Internal Audit provides independent assurance in accordance with its approved audit mandate.
 
-## 6. Executive oversight and metrics
+Responsibilities may include:
 
-Cloud Security provides a concise, trend-based view to the CISO and designated risk committee.
+- Reviewing cloud security risk assessments and control documentation.
+- Monitoring regulatory and contractual compliance requirements.
+- Assessing the adequacy of risk treatment plans.
+- Reviewing control evidence and remediation records.
+- Performing independent assurance over cloud security governance and controls.
 
-Metrics must include scope and denominator, ownership, reporting period, and known limitations. Avoid presenting raw counts without context.
+Internal Audit should retain appropriate independence from the design and operation of the controls it assesses.
 
-Suggested indicators:
+## 4. AWS Shared Responsibility Model
 
-- Percentage of accounts with verified owners, required logging, monitoring, configuration visibility, and approved guardrails.
-- MFA/federated-access coverage and completion of privileged-access recertification.
-- Critical/high findings open past target, age distribution, and exception exposure.
-- Publicly exposed resources and broad security-group rules, by risk tier and time to remediation.
-- CloudTrail coverage, delivery/validation health, and alert pipeline test results.
-- AWS Config coverage and compliance drift for in-scope resources.
-- Threat-detection coverage, high-severity findings, investigation status, and remediation.
-- Encryption coverage for in-scope data stores and backup repositories.
-- Backup coverage against policy, last successful restore test, and RPO/RTO exercise results.
-- Security incident severity, time to acknowledge/contain, recurrence, and after-action item closure.
-- Production deployment policy-gate pass rates, emergency changes, and change traceability.
+Security responsibilities must be clearly understood between AWS and the organization.
 
-Metrics support risk decisions; they do not prove compliance on their own. Material gaps, systemic failures, and accepted high residual risks must be escalated through established governance.
+AWS is responsible for security of the cloud, including the underlying infrastructure, physical facilities, hardware and managed service foundations.
 
-## 7. Evidence and assurance
+The organization is responsible for security in the cloud, including, as applicable:
 
-Evidence should be attributable, time-stamped, reproducible, access-controlled, and retained according to the organization's records schedule.
+- Identity and access management.
+- Data classification and protection.
+- Network and workload configuration.
+- Operating system and application security.
+- Encryption and key management.
+- Logging and monitoring.
+- Backup and recovery.
+- Security incident response.
+
+Responsibilities vary depending on the AWS service and deployment model. Managed services may reduce certain operational responsibilities but do not remove the organization's accountability for data, access, configuration and business risk.
+
+## 5. AWS Account and Organizational Governance
+
+AWS accounts should be managed through an approved organizational structure.
+
+Minimum requirements include:
+
+- Use AWS Organizations where appropriate to centralize account governance.
+- Separate production, development, testing and security functions according to business and risk requirements.
+- Restrict access to the AWS Organizations management account.
+- Avoid using the management account for routine workload deployment.
+- Establish controlled processes for account creation, closure and ownership changes.
+- Use delegated administration for supported security services where appropriate.
+- Apply Service Control Policies (SCPs) to establish organization-level permission guardrails where applicable.
+- Monitor account-level security configurations and unauthorized changes.
+- Maintain an inventory of AWS accounts, workloads, owners and business purposes.
+
+SCPs define permission boundaries within AWS Organizations; they do not grant permissions by themselves. Their applicability and exceptions must be understood, including the special treatment of the management account and service-linked roles.
+
+## 6. Cloud Security Risk Management
+
+Cloud security risks must be identified, assessed, documented and treated through the organization's established risk management framework.
+
+Risk assessments should consider:
+
+- Unauthorized access and privilege escalation.
+- Public exposure of workloads and data.
+- Insecure network configurations.
+- Data loss, leakage or unauthorized disclosure.
+- Misconfigured cloud services.
+- Vulnerable infrastructure and applications.
+- Compromised credentials and secrets.
+- Inadequate monitoring and incident detection.
+- Third-party and supply chain risks.
+- Backup compromise and recovery failure.
+- Availability, resilience and regional service disruption.
+
+Each material risk should have:
+
+- A clear risk description.
+- An identified business and technical owner.
+- An assessment of likelihood and impact.
+- An agreed risk treatment plan.
+- A target remediation date.
+- Documented residual risk where applicable.
+- Management approval where risk acceptance is required.
+
+Risk assessments should be performed before significant new cloud services or workloads are introduced and periodically thereafter.
+
+## 7. Security Control Ownership
+
+Each security control must have an assigned owner responsible for implementation, operation and evidence retention.
+
+| Control area | Primary operational owner | Oversight |
+|---|---|---|
+| IAM and MFA | Cloud platform / IAM team | Information Security |
+| Privileged access | IAM / Cloud platform team | Information Security |
+| Network security | Cloud platform / Network team | Information Security |
+| CloudTrail logging | Cloud platform / Security operations | Information Security |
+| CloudWatch monitoring | Cloud operations / Security operations | Information Security |
+| Threat detection | Security operations / Cloud security | CISO |
+| Encryption and key management | Cloud platform / Data owners | Information Security |
+| Secrets management | Application / Cloud platform teams | Information Security |
+| Configuration management | Cloud platform team | Information Security |
+| Vulnerability management | Infrastructure / Application teams | Information Security |
+| Backup and recovery | Infrastructure / Workload owners | IT management and Information Security |
+| Disaster recovery | IT operations / Business owners | Executive management |
+| Incident response | Security operations / Incident response team | CISO |
+| Secure deployment | Application / DevOps teams | Information Security |
+
+Responsibilities should be formally assigned and reviewed when teams, systems or ownership structures change.
+
+## 8. Security Exceptions and Risk Acceptance
+
+Exceptions to this baseline must be formally documented, assessed and approved before implementation, except where an emergency process is required.
+
+An exception request must include:
+
+- The specific baseline requirement being waived.
+- The business justification.
+- The affected AWS accounts, workloads and data.
+- The associated security and operational risks.
+- Existing or proposed compensating controls.
+- The responsible risk owner.
+- The proposed exception duration and expiry date.
+- The remediation plan, where applicable.
+
+Exceptions should be reviewed by Information Security and approved by the appropriate business or technology risk owner in accordance with the organization's risk authority framework.
+
+Material or high-risk exceptions should be escalated to the CISO and relevant executive risk authority.
+
+Exceptions must not be used to waive applicable legal, regulatory or contractual obligations.
+
+All approved exceptions must be recorded in a centralized risk or exception register and periodically reviewed. Expired exceptions must be reassessed, closed or formally renewed.
+
+## 9. Security Assurance and Control Evidence
+
+AWS security controls must be supported by evidence demonstrating both their implementation and ongoing effectiveness.
 
 Examples include:
 
-- Organization/account inventory exports.
-- Service control policy and configuration records.
-- Identity-provider and MFA reports.
-- CloudTrail status, event selectors, and delivery validation.
-- AWS Config coverage and compliance reports.
-- Security Hub and GuardDuty findings and remediation records, where deployed.
-- KMS key policies and encryption configuration.
-- CloudWatch alert tests.
-- Backup policy and restore records.
-- Access review sign-offs.
-- Approved exceptions.
-- Pipeline run attestations.
-- Incident timelines.
-- Remediation tickets.
+| Control domain | Example evidence |
+|---|---|
+| IAM | IAM policies, role assignments, access reviews and identity configuration |
+| MFA | MFA enforcement settings and identity-provider configuration |
+| Network security | Security group configurations, network diagrams and firewall rules |
+| Logging | CloudTrail configuration, log validation and centralized archive evidence |
+| Monitoring | CloudWatch alarms, dashboards, alert records and incident tickets |
+| Threat detection | GuardDuty, Security Hub and Inspector configuration and findings |
+| Encryption | KMS configuration, key policies and encryption status |
+| Configuration management | AWS Config rules, compliance reports and remediation records |
+| Vulnerability management | Scan reports, risk assessments and remediation tracking |
+| Backup | Backup policies, job reports and restore test evidence |
+| Disaster recovery | Approved recovery plans and exercise results |
+| Incident response | Incident records, investigation reports and lessons learned |
+| Secure deployment | Source control reviews, pipeline security checks and deployment approvals |
 
-Evidence repositories must not be writable by the same routine workload identities whose controls they demonstrate.
+Evidence should be retained in accordance with the organization's record retention, audit and regulatory requirements.
 
-Protect sensitive evidence and incident records according to classification.
+Control assurance should distinguish between:
 
-Independent assurance should sample control design and operating effectiveness, verify exceptions, and test recovery and response—not rely only on screenshots or self-attestation.
+1. **Design effectiveness:** Whether the control is appropriately designed to address the identified risk.
+2. **Implementation:** Whether the control has been configured and deployed as intended.
+3. **Operating effectiveness:** Whether the control continues to operate consistently and produces the intended outcome.
 
-Where the same team operates and assesses a control, the organization should consider independent review proportionate to the control's risk and regulatory significance.
+## 10. Cloud Security Metrics and Reporting
 
-## 8. Policy review and change control
+The CISO and relevant technology leadership should receive regular reporting on the AWS security posture.
 
-Cloud Security owns this baseline.
+Suggested metrics include:
 
-Material changes require documented review by platform, operations, workload representatives, and risk/compliance as appropriate, followed by approval from the designated security authority.
+| Metric | Reporting objective |
+|---|---|
+| MFA coverage | Measure enforcement across human identities and privileged access |
+| Privileged access reviews | Track completion of periodic access reviews |
+| IAM policy exceptions | Monitor excessive permissions and unresolved access risks |
+| Public exposure findings | Track publicly exposed resources and remediation |
+| CloudTrail coverage | Measure account and Region logging coverage |
+| Monitoring coverage | Track critical workload and security alert coverage |
+| Threat detection coverage | Monitor relevant GuardDuty, Security Hub and Inspector coverage |
+| Encryption coverage | Track encryption of applicable storage, databases and communications |
+| Secrets management | Monitor exposed secrets, access and rotation status |
+| Configuration compliance | Track AWS Config coverage and unresolved configuration drift |
+| Vulnerability remediation | Monitor overdue vulnerabilities by severity and risk |
+| Backup success | Track backup completion and failures |
+| Recovery testing | Monitor completion of restore and disaster recovery exercises |
+| Incident management | Track incident severity, response and remediation trends |
+| Security exceptions | Monitor open, overdue and expired exceptions |
 
-Maintain version history and communicate effective dates.
+Metrics should have defined owners, reporting frequency, targets or thresholds, and escalation criteria. Targets should be established based on business requirements and risk appetite rather than assumed universal values.
 
-AWS product documentation and organizational policy take precedence where this reference becomes outdated or conflicts with binding requirements. Record and resolve conflicts through governance rather than silently bypassing controls.
+## 11. Governance and Review Cadence
+
+The following cadence provides a minimum governance reference. Organizations may adopt more frequent reviews based on risk.
+
+| Activity | Minimum review frequency |
+|---|---|
+| Critical security alerts | Continuous monitoring where supported |
+| High-risk security findings | Prioritized review and tracking |
+| Privileged access review | Quarterly |
+| IAM access review | Quarterly or following material changes |
+| Security group and network exposure review | Quarterly |
+| Cloud configuration compliance | Continuous or scheduled monitoring |
+| Vulnerability management | Based on severity and defined remediation SLAs |
+| Backup monitoring | Daily or according to backup schedules |
+| Restore testing | At least annually, with more frequent testing for critical workloads |
+| Disaster recovery exercises | At least annually and following significant changes |
+| Incident response exercises | At least annually |
+| Security exception review | Before expiry and at defined review intervals |
+| Cloud security baseline review | At least annually |
+
+## 12. Third-Party and Supplier Governance
+
+Third parties that access AWS environments or process organizational data must be assessed according to their level of access, service criticality and associated risks.
+
+Minimum expectations include:
+
+- Appropriate security due diligence before engagement.
+- Defined contractual security and data protection requirements.
+- Restricted and monitored third-party access.
+- MFA and individual identities for external users where supported.
+- Time-bound access and periodic access reviews.
+- Appropriate incident notification and escalation obligations.
+- Review of relevant assurance reports and certifications where available.
+- Secure termination of access when contracts or services end.
+
+Third-party access should be treated as a potential extension of the organization's attack surface.
+
+## 13. Governance Review and Continuous Improvement
+
+This governance framework should be reviewed at least annually and following significant changes to:
+
+- AWS architecture or organizational account structures.
+- Business services and workload criticality.
+- Security threats and material vulnerabilities.
+- Regulatory and contractual requirements.
+- Security incidents and audit findings.
+- AWS security services and organizational operating models.
+
+Lessons from incidents, audits, control testing and recovery exercises should be used to improve the baseline and strengthen cloud security maturity.
+
+## 14. Approval and Document Control
+
+| Field | Description |
+|---|---|
+| Document | AWS Cloud Security Governance |
+| Document owner | Information Security Function |
+| Executive sponsor | CISO / Head of Information Security |
+| Review frequency | At least annually |
+| Classification | Internal |
+| Approval authority | Appropriate technology and risk governance authority |
+| Version | 1.0 |
+| Status | Draft for review and approval |
+
+This document should be approved through the organization's established policy and governance process before being adopted as a mandatory organizational standard.
