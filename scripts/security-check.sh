@@ -1,43 +1,128 @@
 #!/usr/bin/env bash
-# Read-only baseline checks. Results are advisory and should be adapted to local policy.
+# Perform basic Linux host security configuration checks.
 set -Eeuo pipefail
 
-pass() { printf 'PASS  %s\n' "$1"; }
-warn() { printf 'WARN  %s\n' "$1"; }
-info() { printf 'INFO  %s\n' "$1"; }
+warnings=0
+checks=0
 
-printf 'Security baseline — %s\n\n' "$(hostname -f 2>/dev/null || hostname)"
-if [[ -r /etc/passwd && $(stat -c '%a' /etc/passwd 2>/dev/null || echo 777) =~ ^[0-7]{3,4}$ ]]; then
-  mode=$(stat -c '%a' /etc/passwd)
-  if (( (8#$mode & 8#022) == 0 )); then pass "/etc/passwd permissions are $mode"; else warn "/etc/passwd is group/world writable (mode $mode)"; fi
-else
-  warn '/etc/passwd is unavailable or its permissions could not be read'
-fi
-if [[ -r /etc/shadow ]]; then
-  mode=$(stat -c '%a' /etc/shadow 2>/dev/null || echo unknown)
-  if [[ "$mode" != unknown ]] && (( (8#$mode & 8#077) == 0 )); then pass "/etc/shadow permissions are restricted (mode $mode)"; else warn "/etc/shadow permissions need review (mode $mode)"; fi
-else
-  info '/etc/shadow is not readable by this user; rerun with appropriate privileges for this check'
-fi
+pass() {
+    printf '[PASS] %s\n' "$1"
+    ((checks += 1))
+}
+
+warn() {
+    printf '[WARN] %s\n' "$1"
+    ((warnings += 1))
+    ((checks += 1))
+}
+
+info() {
+    printf '[INFO] %s\n' "$1"
+}
+
+check_file() {
+    local file="$1"
+    local expected_modes="$2"
+    local description="$3"
+    local mode owner
+
+    if [[ ! -e "$file" ]]; then
+        warn "$description does not exist: $file"
+        return
+    fi
+
+    if ! command -v stat >/dev/null 2>&1; then
+        warn "Cannot inspect $file because stat is unavailable"
+        return
+    fi
+
+    mode=$(stat -c '%a' -- "$file")
+    owner=$(stat -c '%U' -- "$file")
+
+    if [[ "$owner" != "root" ]]; then
+        warn "$description is not owned by root (owner: $owner)"
+    elif " ${expected_modes} " == *" ${mode} "*; then
+        pass "$description has expected ownership and permissions ($owner:$mode)"
+    else
+        warn "$description has unexpected permissions ($owner:$mode); expected: $expected_modes"
+    fi
+}
+
+echo "Linux Security Configuration Check"
+echo "Host: $(hostname -f 2>/dev/null || hostname)"
+echo "Date: $(date)"
+echo
+
+# 1. Account file permissions and ownership.
+echo "Account File Checks"
+check_file "/etc/passwd" "644" "/etc/passwd"
+check_file "/etc/shadow" "600 640" "/etc/shadow"
+
+# 2. SSH root login configuration.
+echo
+echo "SSH Configuration Check"
 
 if command -v sshd >/dev/null 2>&1; then
-  root_login=$(sshd -T 2>/dev/null | awk '$1 == "permitrootlogin" { print $2; exit }' || true)
-  case "$root_login" in
-    no) pass 'SSH root login is disabled' ;;
-    yes) warn 'SSH root login is enabled' ;;
-    '') info 'Could not determine effective SSH PermitRootLogin setting' ;;
-    *) info "SSH PermitRootLogin is set to $root_login; review against policy" ;;
-  esac
+    if ssh_config=$(sshd -T 2>/dev/null); then
+        permit_root_login=$(
+            printf '%s\n' "$ssh_config" |
+                awk '$1 == "permitrootlogin" { print $2; exit }'
+        )
+
+        if [[ "$permit_root_login" == "no" ]]; then
+            pass "SSH root login is disabled"
+        elif [[ -n "$permit_root_login" ]]; then
+            warn "SSH root login setting is '$permit_root_login' rather than 'no'"
+        else
+            warn "Could not determine the effective SSH root login setting"
+        fi
+    else
+        warn "Could not read effective SSH configuration using sshd -T"
+    fi
 else
-  info 'OpenSSH server (sshd) is not installed; SSH server check skipped'
+    info "sshd command not found; SSH configuration check skipped"
 fi
+
+# 3. Host firewall checks.
+echo
+echo "Firewall Checks"
+
+firewall_detected=0
 
 if command -v ufw >/dev/null 2>&1; then
-  if ufw status 2>/dev/null | grep -q '^Status: active'; then pass 'UFW firewall is active'; else warn 'UFW is installed but not reported active'; fi
-elif command -v firewall-cmd >/dev/null 2>&1; then
-  if firewall-cmd --state >/dev/null 2>&1; then pass 'firewalld is active'; else warn 'firewalld is installed but not reported active'; fi
-else
-  info 'No supported host firewall tool (ufw/firewalld) detected; verify network controls separately'
+    firewall_detected=1
+
+    if ufw status 2>/dev/null | grep -q '^Status: active'; then
+        pass "UFW firewall is active"
+    else
+        warn "UFW is installed but is not reported as active"
+    fi
 fi
 
-printf '\nChecks are read-only and do not establish compliance certification. Validate findings against your organization\x27s baseline.\n'
+if command -v firewall-cmd >/dev/null 2>&1; then
+    firewall_detected=1
+
+    if firewall-cmd --state 2>/dev/null | grep -q '^running$'; then
+        pass "firewalld is active"
+    else
+        warn "firewalld is installed but is not reported as running"
+    fi
+fi
+
+if ((firewall_detected == 0)); then
+    warn "No supported host firewall tool (ufw/firewalld) detected; verify network controls separately"
+fi
+
+# 4. Summary.
+echo
+echo "Security Check Summary"
+printf 'Checks performed: %s\n' "$checks"
+printf 'Warnings: %s\n' "$warnings"
+
+if ((warnings > 0)); then
+    echo "Review the warnings and verify settings against your security policy."
+    exit 1
+fi
+
+echo "No issues detected by these basic checks."
+exit 0
