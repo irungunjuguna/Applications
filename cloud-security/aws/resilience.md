@@ -2,7 +2,11 @@
 
 ## 1. Objectives
 
-Every workload must have recovery objectives derived from an approved business impact analysis (BIA), data classification, dependency map, and regulatory/contractual needs. The service owner documents a target Recovery Time Objective (RTO) and Recovery Point Objective (RPO), business owner approval, recovery priorities, and acceptable data loss. “Backed up” does not mean “recoverable.”
+Every workload must have recovery objectives derived from an approved business impact analysis (BIA), data classification, dependency map, and regulatory/contractual needs.
+
+The service owner documents a target Recovery Time Objective (RTO) and Recovery Point Objective (RPO), business owner approval, recovery priorities, and acceptable data loss.
+
+“Backed up” does not mean “recoverable.” Recovery must be demonstrated through testing that validates data integrity, application functionality, dependencies, access, and measured recovery performance.
 
 ## 2. Tiered recovery policy
 
@@ -17,24 +21,33 @@ Use the following as a starting framework; business owners and risk management m
 
 If a workload cannot meet its approved RTO/RPO, record the gap, business impact, interim safeguards, funding/decision owner, and time-bound risk exception.
 
+Recovery objectives must account for dependencies such as identity services, DNS, networking, encryption keys, external providers, licensing, quotas, and operational access.
+
 ## 3. Backup policy requirements
 
-- Define scope, schedule/frequency, retention, encryption, recovery point expectations, owner, and deletion lifecycle for each data store and configuration item. Cover data, databases, file systems, object stores, secrets/configuration needed for recovery, and infrastructure definitions as applicable.
+- Define scope, schedule/frequency, retention, encryption, recovery-point expectations, owner, and deletion lifecycle for each data store and configuration item.
+- Cover data, databases, file systems, object stores, secrets/configuration needed for recovery, and infrastructure definitions as applicable.
 - Use centrally governed backup policies and inventory where available. Ensure account/Region coverage includes all in-scope resources and supported resource types; explicitly identify exclusions.
 - Encrypt backups in transit and at rest using approved key management. Restrict key administrators and backup operators; separate backup deletion authority from routine workload administration.
-- Keep protected copies in a separate account and, where required by threat model, a separate Region. Use logically or physically isolated/immutable vault capabilities where supported and appropriate. Confirm cross-account policies and keys permit recovery without granting broad access.
+- Keep protected copies in a separate account and, where required by the threat model, a separate Region. Use logically or physically isolated/immutable vault capabilities where supported and appropriate.
+- Confirm cross-account policies and encryption keys permit recovery without granting broad access.
 - Protect backup plans, vaults, retention, recovery points, and encryption keys from unauthorized deletion, shortening retention, or disabling. Alert on policy changes and destructive operations.
+- Where supported and appropriate, use AWS Backup Vault Lock or equivalent immutability controls to reduce the risk of unauthorized deletion or retention changes. Validate governance requirements and operational consequences before enabling irreversible settings.
 - Apply retention, legal holds, data residency, privacy, and secure disposal requirements. Avoid retaining data indefinitely without an approved purpose.
 - Back up infrastructure and application configuration in version control, while recognizing that code alone may not preserve data, state, secrets, or service dependencies.
 - Monitor job success/failure, missed recovery points, coverage drift, vault capacity/cost anomalies, and replication lag. Assign failures to an accountable on-call owner and track resolution.
+- Protect backup administration and recovery credentials independently from the routine credentials used to administer production workloads.
 
 ## 4. Recovery testing
 
 - Test restore procedures at a cadence based on tier and after major architecture changes. Include representative data, dependent services, identity, network, DNS, secrets, and operational procedures.
 - Verify integrity, application functionality, access controls, encryption, and consistency—not merely successful job completion.
 - Restore into an isolated, controlled environment. Protect restored sensitive data and prevent test systems from unintentionally connecting to production or public networks.
-- Record test scope, backup point, measured RTO/RPO, results, issues, evidence, owner, and corrective-action deadlines. Test a recovery path that does not depend on the compromised or unavailable primary account when the threat model requires it.
-- Conduct periodic table-top or live exercises for loss of a Region, account compromise, ransomware/destructive actions, and critical provider dependency as appropriate.
+- Record test scope, backup point, measured RTO/RPO, results, issues, evidence, owner, and corrective-action deadlines.
+- Test a recovery path that does not depend on the compromised or unavailable primary account when the threat model requires it.
+- Confirm that recovery personnel can obtain the necessary access, keys, network connectivity, quotas, software, and provider dependencies during a disruption.
+- Conduct periodic tabletop or live exercises for loss of a Region, account compromise, ransomware/destructive actions, and critical provider dependency as appropriate.
+- Retest material failures after corrective actions have been implemented.
 
 ## 5. Disaster recovery architecture and operations
 
@@ -45,11 +58,30 @@ Workload owners must maintain a recovery plan covering:
 - Failover/failback decision authority, customer/business communications, operational staffing, vendor contacts, and security monitoring during recovery.
 - Capacity/quota readiness, infrastructure-as-code version, recovery runbook location, data consistency controls, and rollback criteria.
 - Criteria to declare disaster, validate recovery, exit elevated operations, and return to normal production.
+- Procedures for preserving evidence and assessing security before reconnecting recovered workloads to production networks.
 
-Choose backup-and-restore, pilot-light, warm-standby, multi-site, or other patterns based on approved business objectives and total cost/risk. Multi-Region designs introduce complexity and do not by themselves guarantee resilience. Confirm service-specific behavior, data replication consistency, quota limits, encryption key availability, and regional service support.
+Choose backup-and-restore, pilot-light, warm-standby, multi-site, or other patterns based on approved business objectives and total cost/risk.
+
+Multi-Region designs introduce complexity and do not by themselves guarantee resilience. Confirm service-specific behavior, data replication consistency, quota limits, encryption key availability, and regional service support.
+
+The recovery design must consider whether the primary AWS account, organization, identity provider, or administrative credentials could be unavailable or compromised during the event.
 
 ## 6. Roles, governance, and evidence
 
-The workload owner maintains the plan and test evidence; platform teams provide approved backup foundations; security reviews isolation, encryption, and destructive-risk protections; business owners approve objectives and residual risk. Report backup coverage, restore success, RPO/RTO performance, and overdue corrective actions through governance defined in [governance.md](governance.md).
+The workload owner maintains the plan and test evidence; platform teams provide approved backup foundations; security reviews isolation, encryption, and destructive-risk protections; business owners approve objectives and residual risk.
 
-Minimum evidence includes approved BIA/objectives, resource coverage report, backup policy configuration, encrypted/protected destination, job and failure metrics, access review, restore-test results, DR exercise record, and tracked remediation. A failed restore or missed objective is a risk finding requiring a documented response—not a pass based on backup job status.
+Report backup coverage, restore success, RPO/RTO performance, and overdue corrective actions through governance defined in [governance.md](governance.md).
+
+Minimum evidence includes:
+
+- Approved BIA and recovery objectives.
+- Resource coverage report and documented exclusions.
+- Backup policy configuration and schedule.
+- Encrypted and protected destination.
+- Backup job and failure metrics.
+- Backup administration and access review.
+- Restore-test results and evidence of integrity validation.
+- DR exercise record and measured recovery results.
+- Tracked remediation for failed tests or unmet objectives.
+
+A failed restore or missed objective is a risk finding requiring a documented response—not a pass based on backup job status.
